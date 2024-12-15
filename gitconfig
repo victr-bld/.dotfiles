@@ -1,0 +1,9 @@
+[user]
+	name = victr-bld
+	email = billaudvictor@gmail.com
+[core]
+	editor = nvim
+
+[alias]
+    s = status
+    l = log

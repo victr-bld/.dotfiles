@@ -1,0 +1,172 @@
+set $mod Mod1
+set $mod2 Mod4
+
+# disable auto lock - currently does not work
+exec xset q
+
+# font change
+font pango:JetBrainsMono Nerd Font 10
+
+# start XDG autostart
+exec --no-startup-id dex --autostart --environment i3
+
+# lock the screen
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+
+# nm-applet - need to find out how to show it
+exec --no-startup-id nm-applet
+
+# volume control
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioMicMute exec amixer set Capture toggle
+bindsym XF86AudioMute exec amixer sset 'Master' toggle
+bindsym XF86AudioLowerVolume exec amixer sset 'Master' 5%-
+bindsym XF86AudioRaiseVolume exec amixer sset 'Master' 5%+
+
+# brightness control
+bindsym XF86MonBrightnessUp exec brightnessctl s 10%+
+bindsym XF86MonBrightnessDown exec brightnessctl s 10%-
+
+# mouse control 
+floating_modifier $mod
+tiling_drag modifier titlebar
+
+# app starting
+bindsym $mod+Return exec alacritty
+bindsym $mod2+ampersand exec /usr/bin/zen
+
+# kill focused window
+bindsym $mod+Shift+Q kill
+
+# rofi launch
+bindcode $mod+40 exec "rofi -modi drun,run -show drun -display-drun 'Search'"
+
+# change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# split in horizontal orientation
+# bindsym $mod+h split h
+
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+z layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+q focus parent
+
+# workspace management
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# switch to workspace
+bindsym $mod+ampersand workspace number $ws1
+bindsym $mod+eacute workspace number $ws2
+bindsym $mod+quotedbl workspace number $ws3
+bindsym $mod+apostrophe workspace number $ws4
+bindsym $mod+parenleft workspace number $ws5
+bindsym $mod+minus workspace number $ws6
+bindsym $mod+egrave workspace number $ws7
+bindsym $mod+underscore workspace number $ws8
+bindsym $mod+ccedilla workspace number $ws9
+bindsym $mod+agrave workspace number $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+ampersand move container to workspace number $ws1
+bindsym $mod+Shift+eacute move container to workspace number $ws2
+bindsym $mod+Shift+quotedbl move container to workspace number $ws3
+bindsym $mod+Shift+apostrophe move container to workspace number $ws4
+bindsym $mod+Shift+parenleft move container to workspace number $ws5
+bindsym $mod+Shift+minus move container to workspace number $ws6
+bindsym $mod+Shift+egrave move container to workspace number $ws7
+bindsym $mod+Shift+underscore move container to workspace number $ws8
+bindsym $mod+Shift+ccedilla move container to workspace number $ws9
+bindsym $mod+Shift+agrave move container to workspace number $ws10
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'exit i3?' -B 'Yes, exit i3' 'i3-msg exit'"
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        bindsym j resize shrink width 5 px or 5 ppt
+        bindsym k resize grow height 5 px or 5 ppt
+        bindsym l resize shrink height 5 px or 5 ppt
+        bindsym m resize grow width 5 px or 5 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 5 px or 5 ppt
+        bindsym Down resize grow height 5 px or 5 ppt
+        bindsym Up resize shrink height 5 px or 5 ppt
+        bindsym Right resize grow width 5 px or 5 ppt
+
+        # back to normal: Enter or Escape or $mod+r
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+bindsym $mod+r mode "resize"
+
+# polybar setup
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+# focus_follows_mouse no
+for_window [class="^.*"] border pixel 1
+
+# class                 border  backgr. text    indicator child_border
+client.focused          #f2f7ff #f2f7ff #f2f7ff #f2f7ff   #f2f7ff
+client.unfocused        #46474a #46474a #46474a #46474a   #46474a
+client.focused_inactive #46474a #46474a #46474a #46474a   #46474a
+client.unfocused        #46474a #46474a #46474a #46474a   #46474a
+client.urgent           #46474a #46474a #46474a #46474a   #46474a
+client.placeholder      #46474a #46474a #46474a #46474a   #46474a
+
+# start picom
+exec_always --no-startup-id picom
+
+# gaps setup
+gaps inner 10
+smart_gaps on
+smart_borders on
+
+# wallpaper
+exec_always --no-startup-id feh --bg-fill ~/Pictures/belle.png
+
+# keyboard shortcuts
+exec setxkbmap -option caps:escape
+
