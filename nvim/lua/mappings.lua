@@ -1,48 +1,70 @@
--- default mappings
+-- mappings
 
--- set the leader key to space
-vim.g.mapleader = " "
+-- map function
+function map(mode, lhs, rhs, opts)
+    local options = { noremap = true, silent=true }
+    if opts then
+        options = vim.tbl_extend("force", options, opts)
+    end
+    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+end
 
-vim.opt.clipboard:append { 'unnamedplus' }
+-- workaround to use CTRL+] on laptop
+map("n", "<C-)>", "<C-]>")
 
--- open the file explorer with <leader>pv in normal mode
--- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+-- tab bindings 
+map("n", "<leader>t", ":tabnew<CR>")
+map("n", "<leader>x", ":tabclose<CR>")
+map("n", "<leader>l", ":tabn<CR>")
+map("n", "<leader>h", ":tabp<CR>")
+map("n", "<leader>b", ":lua vim.opt.showtabline = vim.opt.showtabline:get() == 2 and 0 or 2<CR>")
 
--- scroll down and center the cursor with <c-d> in normal mode
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
+-- easy split generation
+map("n", "<leader>v", ":vsplit")
+map("n", "<leader>s", ":split")
 
--- scroll up and center the cursor with <c-u> in normal mode
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
+-- easy split navigation
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-l>", "<C-w>l")
+map("n", "<C-j>", "<C-w>j")
+map("n", "<C-k>", "<C-w>k")
 
--- search forward and center the cursor with "n" in normal mode
-vim.keymap.set("n", "n", "nzzzv")
+-- open netwr
+map("n", "<leader>m", ":Explore<CR>")
 
--- search backward and center the cursor with "n" in normal mode
-vim.keymap.set("n", "N", "Nzzzv")
+-- saving files & quitting insert mode
+map("n", "<C-s>", ":w<CR>")
+map("i", "<C-c>", "<Esc>")
 
--- center screen when moving
+-- terminal
+map("n", "<leader><CR>", ":terminal<CR>")
+map("t", "<C-c>", "<C-\\><C-n>")
+
+-- scrolling
+map("n", "<C-d>", "<C-d>zz")
+map("n", "<C-u>", "<C-u>zz")
+map("n", "n", "nzzzv")
+map("n", "N", "Nzzzv")
 vim.api.nvim_create_autocmd("CursorMoved", {
     pattern = "*",
     command = "normal! zz"
 })
 
--- move selected lines down with "J" in visual mode
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+-- copy and paste without registers
+map("x", "<leader>p", [["_dP]])
+map("v", "<leader>d", [["_d]])
 
--- move selected lines up with "K" in visual mode
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+-- openwrt
 
--- join lines with "J" in normal mode
--- vim.keymap.set("n", "J", "mzJz")
-
--- paste in visual mode without overwriting the clipboard
-vim.keymap.set("x", "<leader>p", [["_dP]])
-
--- delete to the black hole register (not saved) with <leader>d in normal and visual mode
-vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
-
--- change all occurence of selection with <leader>c in visual mode
-vim.keymap.set("v", "<leader>c", [["hy:%s/<C-r>h//gc<left><left><left>]], { noremap = true, silent = false })
-
--- save the file with <c-s> in normal mode
-vim.keymap.set("n", "<C-s>", ":w<CR>", { silent = true })
+-- map space + o to comment or uncomment a token in Openwrt
+vim.keymap.set("n", "<leader>o", function()
+  local line_nr = vim.fn.line(".")
+  local line = vim.fn.getline(line_nr)
+  if line:match("^CONFIG_.*=y$") then
+    local new_line = line:gsub("^(CONFIG_.-)=y$", "# %1 is not set")
+    vim.fn.setline(line_nr, new_line)
+  elseif line:match("^# CONFIG_.* is not set$") then
+    local new_line = line:gsub("^# (CONFIG_.-) is not set$", "%1=y")
+    vim.fn.setline(line_nr, new_line)
+  end
+end, { silent = true })
